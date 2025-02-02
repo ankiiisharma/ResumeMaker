@@ -1,14 +1,12 @@
-import Footer from '@/components/Footer'
-import Hero from '@/components/Hero'
-import React from 'react'
+import Hero from "@/components/Hero";
+import React from "react";
 
 const LandingPage = () => {
   return (
-    <> 
-        <Hero />
-       
+    <>
+      <Hero />
     </>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

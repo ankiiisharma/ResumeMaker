@@ -1,6 +1,6 @@
-import LandingPage from '@/pages/LandingPage';
-import GridBackground from '@/components/ui/gridBackground'
-import GradientOverlay from '@/components/ui/gradientOverlay';
+import LandingPage from "@/pages/LandingPage";
+import GridBackground from "../components/ui/GridBackground";
+import GradientOverlay from "../components/ui/GradientOverlay";
 
 const page = () => {
   return (
@@ -9,7 +9,7 @@ const page = () => {
       <GradientOverlay />
       <LandingPage />
     </>
-  )
-}
+  );
+};
 
-export default page
+export default page;

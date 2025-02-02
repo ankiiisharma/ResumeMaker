@@ -4,6 +4,7 @@ import { FaLinkedin } from "react-icons/fa6";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Navbar from "./Navbar";
 import { GrContactInfo } from "react-icons/gr";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -20,9 +21,11 @@ const Hero = () => {
         <div className="w-full md:w-[500px] lg:w-[700px] h-1 bg-gradient-to-r from-transparent via-blue-300 to-transparent mt-3" />
 
         <div className="grid grid-cols-3 md:grid-cols-3 gap-4 mt-4">
-          <button className="bg-blue-500 py-2 px-3 hover:bg-blue-600 hover:translate-y-[-2px] duration-150 ease-in-out font-semibold tracking-[-1px] rounded-md border border-slate-50/10 flex items-center">
-            <GrContactInfo className="mr-2 h-5" /> Fill data manually
-          </button>
+          <Link href="/personal">
+            <button className="bg-blue-500 py-2 px-3 hover:bg-blue-600 hover:translate-y-[-2px] duration-150 ease-in-out font-semibold tracking-[-1px] rounded-md border border-slate-50/10 flex items-center">
+              <GrContactInfo className="mr-2 h-5" /> Fill data manually
+            </button>
+          </Link>
 
           <button
             className="relative bg-blue-500 py-2 px-3 hover:bg-gray-500 cursor-not-allowed font-semibold tracking-[-1px] rounded-md border border-slate-50/10 flex items-center"
