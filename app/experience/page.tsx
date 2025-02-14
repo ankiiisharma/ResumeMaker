@@ -1,18 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { DataContext } from "@/context/DataContext";
 import { motion } from "framer-motion";
 import GridBackground from "@/components/ui/GridBackground";
 import GradientOverlay from "@/components/ui/GradientOverlay";
 import { AiTwotoneExperiment } from "react-icons/ai";
-// import CurrentPosition from "@/components/CurrentPosition";
-import ReactGA from "react-ga4";
 import Link from "next/link";
-
-import { MdDelete } from "react-icons/md";
-import { IoMdAddCircle } from "react-icons/io";
+import { FaTrashAlt } from "react-icons/fa";
+import { FaPlusCircle } from "react-icons/fa";
 
 type FormData = {
   company: string;
@@ -22,14 +19,33 @@ type FormData = {
   points: string[];
 };
 
+// const defaultExperience: FormData = {
+//   company: "",
+//   role: "",
+//   location: "",
+//   date: "",
+//   points: [""],
+// };
+
 export default function Experience() {
   const context = useContext(DataContext);
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData[]>(
-    context?.data.experience || [
-      { company: "", role: "", location: "", date: "", points: [""] },
-    ]
-  );
+  const [formData, setFormData] = useState<FormData[]>([]);
+
+  useEffect(() => {
+    if (context?.data.experience && context.data.experience.length > 0) {
+      setFormData(context.data.experience);
+    } else {
+      const initialExperience: FormData = {
+        company: "",
+        role: "",
+        location: "",
+        date: "",
+        points: [""]
+      };
+      setFormData([initialExperience]);
+    }
+  }, [context?.data.experience]);
 
   if (!context) {
     return <p className="text-red-500">Error: DataContext not found</p>;
@@ -38,25 +54,19 @@ export default function Experience() {
   const { updateData } = context;
 
   const addInput = () => {
-    const data = {
+    const newExperience: FormData = {
       company: "",
       role: "",
       location: "",
       date: "",
-      points: [""],
+      points: [""]
     };
-    setFormData([...formData, data]);
+    setFormData([...formData, newExperience]);
   };
 
   const nextPage = () => {
-    ReactGA.send({
-      hitType: "pageview",
-      page: `${window.location.pathname + window.location.search}`,
-      title: "experience",
-    });
     updateData("experience", formData);
-    console.log(formData);
-    // router.push("/projects");
+    router.push("/projects");
   };
 
   const handleFormChange = (
@@ -65,11 +75,12 @@ export default function Experience() {
   ) => {
     const data = [...formData];
     const fieldName = event.target.name as keyof FormData;
-    if (fieldName === "points") {
-      data[index].points = [event.target.value];
-    } else {
-      data[index][fieldName] = event.target.value;
-    }
+    
+    // Remove the points handling from here since we have a separate handler for points
+    data[index] = {
+      ...data[index],
+      [fieldName]: event.target.value
+    };
     setFormData(data);
   };
 
@@ -79,26 +90,43 @@ export default function Experience() {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const data = [...formData];
-    data[index].points[pointIndex] = event.target.value;
+    const newPoints = [...data[index].points];
+    newPoints[pointIndex] = event.target.value;
+    data[index] = {
+      ...data[index],
+      points: newPoints
+    };
     setFormData(data);
   };
 
   const addPoint = (index: number) => {
     const data = [...formData];
-    data[index].points.push("");
+    data[index] = {
+      ...data[index],
+      points: [...data[index].points, ""]
+    };
     setFormData(data);
   };
 
   const removeItem = (index: number) => {
-    const data = [...formData];
-    data.splice(index, 1);
-    setFormData(data);
+    if (formData.length > 1) {
+      const data = [...formData];
+      data.splice(index, 1);
+      setFormData(data);
+    }
   };
 
   const removePoint = (index: number, pointIndex: number) => {
-    const data = [...formData];
-    data[index].points.splice(pointIndex, 1);
-    setFormData(data);
+    if (formData[index].points.length > 1) {
+      const data = [...formData];
+      const newPoints = [...data[index].points];
+      newPoints.splice(pointIndex, 1);
+      data[index] = {
+        ...data[index],
+        points: newPoints
+      };
+      setFormData(data);
+    }
   };
 
   return (
@@ -107,7 +135,7 @@ export default function Experience() {
       <GradientOverlay />
 
       <motion.div
-        className="min-h-screen flex flex-col items-center justify-center text-white px-4"
+        className="min-h-screen flex flex-col items-center justify-start pt-10 text-white px-4"
         initial={{ opacity: 0, y: -50 }}
         animate={{
           opacity: 1,
@@ -116,7 +144,7 @@ export default function Experience() {
         }}
       >
         <motion.div
-          className="flex items-center"
+          className="flex items-center mb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{
             opacity: 1,
@@ -124,13 +152,13 @@ export default function Experience() {
             transition: { type: "spring", stiffness: 50, delay: 0.4 },
           }}
         >
-          <h1 className="text-4xl text-blue-400 font-semibold tracking-[-2px] mb-6 flex items-center">
-            <AiTwotoneExperiment className="w-8 mr-2" /> Experience
+          <h1 className="text-2xl text-blue-400 font-semibold tracking-[-1px] flex items-center">
+            <AiTwotoneExperiment className="w-6 mr-2" /> Experience
           </h1>
-          <div className="w-[150px] h-1 bg-gradient-to-r from-blue-500 via-blue-300 to-transparent rounded-full mb-6 ml-2" />
+          <div className="w-[100px] h-0.5 bg-gradient-to-r from-blue-500 via-blue-300 to-transparent rounded-full ml-2" />
         </motion.div>
         <motion.div
-          className="w-full max-w-2xl bg-gray-900 border border-gray-300/30 p-8 rounded-xl shadow-lg"
+          className="w-full max-w-3xl bg-gray-900 border border-gray-300/30 p-8 rounded-xl shadow-lg mb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{
             opacity: 1,
@@ -141,13 +169,15 @@ export default function Experience() {
           {formData.map((value, index) => (
             <div key={index} className="mb-6">
               <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => removeItem(index)}
-                  className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex items-center"
-                >
-                  <MdDelete className="w-5" /> Delete this experience
-                </button>
+                {formData.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeItem(index)}
+                    className="focus:outline-none text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex items-center"
+                  >
+                    <FaTrashAlt className="w-5" /> Delete this experience
+                  </button>
+                )}
               </div>
               <div className="grid gap-3 mb-6 md:grid-cols-2">
                 <div>
@@ -226,13 +256,15 @@ export default function Experience() {
                       required
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => removePoint(index, pointIndex)}
-                    className="focus:outline-none text-white mt-7 bg-gray-700 hover:bg-gray-500 font-medium rounded-lg text-sm px-5 h-10"
-                  >
-                    <MdDelete />
-                  </button>
+                  {value.points.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removePoint(index, pointIndex)}
+                      className="focus:outline-none text-white mt-7 bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 h-10"
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  )}
                 </div>
               ))}
 
@@ -240,10 +272,10 @@ export default function Experience() {
                 <button
                   type="button"
                   onClick={() => addPoint(index)}
-                  className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-1 flex items-center"
+                  className="text-white bg-teal-600 hover:bg-teal-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-1 flex items-center"
                 >
-                  <IoMdAddCircle className="mr-2" />
-                  {addPoint.length === 0 ? "Add Point" : "Add Another Point"}
+                  <FaPlusCircle className="mr-2" />
+                  Add Another Point
                 </button>
               </div>
             </div>
@@ -253,27 +285,25 @@ export default function Experience() {
             <button
               type="button"
               onClick={addInput}
-              className="focus:outline-none text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex items-center"
+              className="focus:outline-none text-white bg-teal-600 hover:bg-teal-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 flex items-center"
             >
-              <IoMdAddCircle className="mr-1 w-6" />
-              {formData.length === 1
-                ? "Add Experience"
-                : "Add Another Experience"}
+              <FaPlusCircle className="mr-1 w-6" />
+              Add Another Experience
             </button>
           </div>
 
-          <div className="flex justify-between w-full">
+          <div className="w-full justify-center flex mt-2">
             <button
               type="button"
-              onClick={() => router.back()}
               className="text-white bg-blue-700 font-semibold hover:bg-blue-800 w-[50%] rounded-md text-sm px-5 py-2.5 mr-2 mb-2"
             >
-              Previous
+              <Link href="/education">Previous</Link>
             </button>
+
             <button
               type="button"
               onClick={nextPage}
-              className="text-white bg-blue-700 hover:bg-blue-800 w-[50%] font-semibold rounded-md text-sm px-5 py-2.5 mr-2 mb-2"
+              className="text-white bg-blue-700 font-semibold hover:bg-blue-800 w-[50%] rounded-md text-sm px-5 py-2.5 mr-2 mb-2"
             >
               Next
             </button>

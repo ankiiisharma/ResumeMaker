@@ -11,7 +11,7 @@ import { MdOutlineNavigateNext } from "react-icons/md";
 import { motion } from "framer-motion";
 import GridBackground from "@/components/ui/GridBackground";
 import GradientOverlay from "@/components/ui/GradientOverlay";
-import Link from "next/link";
+// import Link from "next/link";
 
 // Define validation schema
 const formSchema = z.object({
@@ -59,20 +59,7 @@ export default function PersonalDetail() {
     updateData("personalDetail", formData);
     router.push("/education");
   };
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 50,
-        delay: 0.2,
-      },
-    },
-  };
-
+  
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -91,15 +78,11 @@ export default function PersonalDetail() {
       <GridBackground />
       <GradientOverlay />
 
-      <motion.div
-        className="min-h-screen flex flex-col items-center justify-center text-white px-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
+      <div
+        className="min-h-screen flex flex-col items-center justify-center text-white px-4"      >
         <motion.div className="flex items-center" variants={itemVariants}>
           <h1 className="text-4xl text-blue-400 font-semibold tracking-[-2px] mb-6 flex items-center">
-            <FaUser className="w-6 mr-2" /> Professional Information
+            <FaUser className="w-6 mr-2" /> Personal Information
           </h1>
           <div className="w-[150px] h-1 bg-gradient-to-r from-blue-500 via-blue-300 to-transparent rounded-full mb-6 ml-2" />
         </motion.div>
@@ -217,18 +200,19 @@ export default function PersonalDetail() {
             </div>
 
             {/* Submit Button */}
-            <Link href="/experience">
+            {/* <Link href="/experience"> */}
               <div className="flex justify-start">
-                <button className="bg-blue-500 w-full text-white px-5 py-2 rounded-md flex flex-row items-center hover:bg-blue-800 transition-all duration-150 mt-3 justify-center">
+                <button className="bg-blue-500 w-full text-white px-5 py-2 rounded-md flex flex-row items-center hover:bg-blue-800 transition-all duration-150 mt-3 justify-center"
+                onSubmit={handleSubmit(onSubmit)}                >
                   <p className="tracking-[-1px] font-semibold flex items-center">
                     Next <MdOutlineNavigateNext className="w-5 h-5 ml-1" />
                   </p>
                 </button>
               </div>
-            </Link>
+            {/* </Link> */}
           </form>
         </motion.div>
-      </motion.div>
+      </div>
     </>
   );
 }

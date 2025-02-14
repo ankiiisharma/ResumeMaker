@@ -19,13 +19,37 @@ interface ExperienceType {
   points: string[];
 }
 
+interface EducationType {
+  college: string;
+  course: string;
+  location: string
+  date: string;
+}
+
+interface Projects {
+  name: string;
+  techstack: string;
+  link: string;
+  description: string[];
+}
+
+interface Achievements {
+  name: string;
+  description: string[];
+}
+
+interface Skills {
+  name: string, 
+  skills: string
+}
+
 interface DataType {
   personalDetail: PersonalDetailType | null;
   experience: ExperienceType[] | null;
-  education: string[];
-  projects: string[];
-  achievements: string[];
-  skills: string[];
+  education: EducationType[] | null;
+  projects: Projects[] | null;
+  achievements: Achievements[] | null;
+  skills: Skills[] | null;
 }
 
 interface DataContextType {
@@ -91,9 +115,22 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
           points: [],
         },
       ],
-      education: [],
-      projects: [],
-      achievements: [],
+      education: [{
+        college: "",
+        course: "",
+        location: "",
+        date: "",
+      },],
+      projects: [{
+          name: "",
+          techstack: "",
+          link: "",
+          description: []
+      }],
+      achievements: [{
+        name: "",
+        description: [],
+      }],
       skills: [],
     });
   };
