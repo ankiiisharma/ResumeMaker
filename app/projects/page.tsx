@@ -10,17 +10,17 @@ import { FaPlusCircle, FaTrashAlt } from 'react-icons/fa'
 import { TbSettingsCog } from "react-icons/tb";
 
 interface Projects {
-    name: string;
-    techstack: string;
+    projectName: string;
+    tech: string;
     link: string;
-    description: string[];
+    points: string[];
 }
 
 const defaultProjects: Projects = {
-    name: "",
-    techstack: "",
+    projectName: "",
+    tech: "",
     link: "",
-    description: [""]
+    points: ["", ""]
 };
 
 export default function Projects() {
@@ -52,11 +52,11 @@ export default function Projects() {
       event: React.ChangeEvent<HTMLInputElement>
     ) => {
       const data = [...formData];
-      const newPoints = [...data[index].description];
+      const newPoints = [...data[index].points];
       newPoints[pointIndex] = event.target.value;
       data[index] = {
         ...data[index],
-        description: newPoints
+        points: newPoints
       };
       setFormData(data);
     };
@@ -69,7 +69,7 @@ export default function Projects() {
       const data = [...formData];
       data[index] = {
         ...data[index],
-        description: [...data[index].description, ""]
+        points: [...data[index].points, ""]
       };
       setFormData(data);
     };
@@ -83,13 +83,13 @@ export default function Projects() {
     };
   
     const removePoint = (index: number, pointIndex: number) => {
-      if (formData[index].description.length > 1) {
+      if (formData[index].points.length > 1) {
         const data = [...formData];
-        const newPoints = [...data[index].description];
+        const newPoints = [...data[index].points];
         newPoints.splice(pointIndex, 1);
         data[index] = {
           ...data[index],
-          description: newPoints
+          points: newPoints
         };
         setFormData(data);
       }
@@ -159,10 +159,10 @@ export default function Projects() {
                   </label>
                   <input
                     type="text"
-                    name="name"
+                    name="projectName"
                     placeholder="tic-tac-toe"
-                    value={value.name}
-                    onChange={(e) => handleInputChange(index, "name", e.target.value)}
+                    value={value.projectName}
+                    onChange={(e) => handleInputChange(index, "projectName", e.target.value)}
                     className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -189,17 +189,17 @@ export default function Projects() {
                   </label>
                   <input
                     type="text"
-                    name="techstack"
+                    name="tech"
                     placeholder="Typescript, React, Tailwindcss"
-                    value={value.techstack}
-                    onChange={(e) => handleInputChange(index, "techstack", e.target.value)}
+                    value={value.tech}
+                    onChange={(e) => handleInputChange(index, "tech", e.target.value)}
                     className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
             </div>
          </div>
          
-         {value.description.map((point, pointIndex) => (
+         {value.points.map((point, pointIndex) => (
                 <div
                   key={pointIndex}
                   className="flex flex-row space-x-5 w-full mb-4"
@@ -217,7 +217,7 @@ export default function Projects() {
                       required
                     />
                   </div>
-                  {value.description.length > 1 && (
+                  {value.points.length > 1 && (
                       <button
                       type="button"
                       onClick={() => removePoint(index, pointIndex)}

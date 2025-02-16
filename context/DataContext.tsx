@@ -20,30 +20,30 @@ interface ExperienceType {
 }
 
 interface EducationType {
-  college: string;
+  cllgName: string;
   course: string;
-  location: string
-  date: string;
+  location: string;
+  year: string;
 }
 
 interface Projects {
-  name: string;
-  techstack: string;
+  projectName: string;
+  tech: string;
   link: string;
-  description: string[];
+  points: string[];
 }
 
 interface Achievements {
   name: string;
-  description: string[];
+  points: string[];
 }
 
-interface Skills {
-  name: string, 
-  skills: string
+export interface Skills {
+  skillName: string;
+  skillValue: string;
 }
 
-interface DataType {
+export interface DataType {
   personalDetail: PersonalDetailType | null;
   experience: ExperienceType[] | null;
   education: EducationType[] | null;
@@ -71,29 +71,31 @@ interface DataProviderProps {
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [data, setData] = useState<DataType>({
-    personalDetail: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNo: "",
-      github: "",
-      linkedin: "",
-    },
-    experience: [],
-    education: [],
-    projects: [],
-    achievements: [],
-    skills: [],
+    personalDetail: null,
+    experience: null,
+    education: null,
+    projects: null,
+    achievements: null,
+    skills: null
   });
 
   const updateData = <K extends keyof DataType>(
     event: K,
     newData: DataType[K]
   ) => {
-    setData((prevData) => ({
-      ...prevData,
-      [event]: newData,
-    }));
+    try {
+      console.log(`Updating ${String(event)}:`, newData); // Debug log
+      setData((prevData) => {
+        const updatedData = {
+          ...prevData,
+          [event]: newData,
+        };
+        console.log('Updated state:', updatedData); // Debug log
+        return updatedData;
+      });
+    } catch (error) {
+      console.error(`Error updating ${String(event)}:`, error);
+    }
   };
 
   const setDefault = () => {
@@ -106,32 +108,33 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         github: "",
         linkedin: "",
       },
-      experience: [
-        {
-          company: "",
-          role: "",
-          location: "",
-          date: "",
-          points: [],
-        },
-      ],
-      education: [{
-        college: "",
-        course: "",
+      experience: [{
+        company: "",
+        role: "",
         location: "",
         date: "",
-      },],
+        points: [""]
+      }],
+      education: [{
+        cllgName: "",
+        course: "",
+        location: "",
+        year: "",
+      }],
       projects: [{
-          name: "",
-          techstack: "",
-          link: "",
-          description: []
+        projectName: "",
+        tech: "",
+        link: "",
+        points: [""]
       }],
       achievements: [{
         name: "",
-        description: [],
+        points: [""]
       }],
-      skills: [],
+      skills: [{
+        skillName: "",
+        skillValue: ""
+      }]
     });
   };
 

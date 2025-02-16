@@ -5,24 +5,22 @@ import { motion } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { DataContext } from "@/context/DataContext";
+import type { Skills } from "@/context/DataContext";
 import { FaPlusCircle, FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-interface Skills {
-  name: string;
-  skills: string;
-}
-
 const defaultSkills: Skills = {
-  name: "",
-  skills: "",
+  skillName: "",
+  skillValue: "",
 };
 
 export default function Skills() {
   const router = useRouter();
   const context = useContext(DataContext);
-  const [formData, setFormData] = useState<Skills[]>([defaultSkills]);
+  const [formData, setFormData] = useState<Skills[]>(
+    context?.data.skills ?? [defaultSkills]
+  );
 
   const removeItem = (index: number) => {
     const data = [...formData];
@@ -33,10 +31,9 @@ export default function Skills() {
   };
 
   const addItem = () => {
-    // Create a new skills object instead of referencing the default one
     const newSkills: Skills = {
-      name: "",
-      skills: ""
+      skillName: "",
+      skillValue: ""
     };
     setFormData(prevData => [...prevData, newSkills]);
   };
@@ -54,10 +51,9 @@ export default function Skills() {
 
   useEffect(() => {
     if (context?.data.skills && context.data.skills.length > 0) {
-      // Create new objects for each skill section to avoid reference issues
       const initialSkills = context.data.skills.map(skill => ({
-        name: skill.name,
-        skills: skill.skills
+        skillName: skill.skillName,
+        skillValue: skill.skillValue
       }));
       setFormData(initialSkills);
     } else {
@@ -68,10 +64,12 @@ export default function Skills() {
   const updateData = context?.updateData;
 
   const nextPage = () => {
-    if (updateData) {
-      updateData("skills", formData);
-    } else {
-      alert("isn't working right now!");
+    if (updateData && formData.length > 0) {
+      const validData = formData.filter(item => 
+        item.skillName.trim() !== "" || 
+        item.skillValue.trim() !== ""
+      );
+      updateData("skills", validData.length > 0 ? validData : null);
     }
     router.push("/review");
   };
@@ -123,13 +121,13 @@ export default function Skills() {
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 w-1/3">
                   <label className="block text-base font-semibold tracking-tight text-gray-200 mb-1">
-                    Title
+                    Skill
                   </label>
                   <input
                     type="text"
-                    placeholder="Languages/Framework/Tools"
-                    value={value.name}
-                    onChange={(e) => handleChange(index, "name", e.target.value)}
+                    placeholder="language"
+                    value={value.skillName}
+                    onChange={(e) => handleChange(index, "skillName", e.target.value)}
                     className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -137,13 +135,13 @@ export default function Skills() {
 
                 <div className="flex-1 w-2/3">
                   <label className="block text-base font-semibold tracking-tight text-gray-200 mb-1">
-                    Skills
+                    Skill Value
                   </label>
                   <input
                     type="text"
-                    placeholder="C++, TypeScript, JavaScript, AWS"
-                    value={value.skills}
-                    onChange={(e) => handleChange(index, "skills", e.target.value)}
+                    placeholder="c++, java, docker"
+                    value={value.skillValue}
+                    onChange={(e) => handleChange(index, "skillValue", e.target.value)}
                     className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />

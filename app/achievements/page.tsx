@@ -13,12 +13,12 @@ import Link from 'next/link';
 
 type Achievements = {
     name: string;
-    description: string[];
+    points: string[];
 }
 
 const defaultAchievement : Achievements = {
     name: "",
-    description: [""],
+    points: [""],
 }
 
 export default function Achievements() {
@@ -54,8 +54,8 @@ const handlePointChange = (index: number, pointIndex: number, event: React.Chang
     const newFormData = formData.map((item, i) => 
         i === index ? { 
             ...item, 
-            description: item.description.map((desc, j) => 
-                j === pointIndex ? event.target.value : desc
+            points: item.points.map((point, j) => 
+                j === pointIndex ? event.target.value : point
             ) 
         } : item
     );
@@ -66,7 +66,7 @@ const removePoint = (index: number, pointIndex: number) => {
     const newFormData = formData.map((item, i) => 
         i === index ? { 
             ...item, 
-            description: item.description.filter((_, j) => j !== pointIndex)
+            points: item.points.filter((_, j) => j !== pointIndex)
         } : item
     );
     setFormData(newFormData);
@@ -76,7 +76,7 @@ const addPoint = (index: number) => {
     const newFormData = formData.map((item, i) => 
         i === index ? { 
             ...item, 
-            description: [...item.description, ""]
+            points: [...item.points, ""]
         } : item
     );
     setFormData(newFormData);
@@ -151,7 +151,7 @@ const nextPage = () => {
                   />
             </div> 
 
-            {value.description.map((point, pointIndex) => (
+            {value.points.map((point, pointIndex) => (
                 <div className='flex flex-row space-x-5 w-full mb-4' key={pointIndex}> 
                     <div className="w-[90%]">
                     <label className="text-base font-semibold tracking-tight text-gray-200 mb-1 flex items-end">
@@ -166,7 +166,7 @@ const nextPage = () => {
                       required
                     />
                   </div>
-                  {value.description.length >= 0 && (
+                  {value.points.length >= 0 && (
                       <button
                       type="button"
                       onClick={() => removePoint(index, pointIndex)}

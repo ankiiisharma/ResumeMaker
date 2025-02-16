@@ -65,7 +65,15 @@ export default function Experience() {
   };
 
   const nextPage = () => {
-    updateData("experience", formData);
+    if (updateData && formData.length > 0) {
+      // Filter out empty entries
+      const validData = formData.filter(item => 
+        item.company.trim() !== "" || 
+        item.role.trim() !== "" || 
+        item.points.some(point => point.trim() !== "")
+      );
+      updateData("experience", validData.length > 0 ? validData : null);
+    }
     router.push("/projects");
   };
 

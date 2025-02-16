@@ -1,7 +1,8 @@
 "use client"
 import React, { useState, useContext, useRef } from 'react';
 import Navbar from '../../components/Navbar';
-import { DataContext } from '../../context/DataContext';
+import { DataContext, DataType } from "@/context/DataContext";
+import type { Skills } from "@/context/DataContext";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,7 +12,8 @@ import GridBackground from '@/components/ui/GridBackground';
 import GradientOverlay from '@/components/ui/GradientOverlay';
 import { FaDownload } from 'react-icons/fa';
 import { AiOutlineClose } from 'react-icons/ai';
-import { MdEmail } from 'react-icons/md';
+import { GrAchievement } from 'react-icons/gr';
+// import { MdEmail } from 'react-icons/md';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -33,36 +35,22 @@ interface ExperienceType {
 }
 
 interface EducationType {
-  college: string;
+  cllgName: string;
   course: string;
   location: string;
-  date: string;
+  year: string;
 }
 
 interface Projects {
-  name: string;
-  techstack: string;
+  projectName: string;
+  tech: string;
   link: string;
-  description: string[];
+  points: string[];
 }
 
 interface Achievements {
   name: string;
-  description: string[];
-}
-
-interface Skills {
-  name: string, 
-  skills: string
-}
-
-interface DataType {
-  personalDetail: PersonalDetailType | null;
-  experience: ExperienceType[] | null;
-  education: EducationType[] | null;
-  projects: Projects[] | null;
-  achievements: Achievements[] | null;
-  skills: Skills[] | null;
+  points: string[];
 }
 
 export default function Review() {
@@ -89,12 +77,35 @@ export default function Review() {
           <DownloadModal data={data} />
         </div>
         <div className='xl:mx-[20%] md:mx-[10%] mx-[4%] h-[90%]'>
-          <Section title="Personal Details" data={data?.personalDetail} Component={PersonalDetailSection} />
-          <Section title="Education" data={data?.education} Component={EducationSection} />
-          <Section title="Experience" data={data?.experience} Component={ExperienceSection} />
-          <Section title="Projects" data={data?.projects} Component={ProjectSection} />
-          <Section title="Achievement" data={data?.achievements} Component={AchievementSection} />
-          <Section title="Skills" data={data?.skills} Component={SkillsSection} />
+          <Section<PersonalDetailType> title="Personal Details" data={data?.personalDetail} Component={PersonalDetailSection} />
+          <Section<EducationType[]> title="Education" data={data?.education} Component={EducationSection} />
+          <Section<ExperienceType[]> title="Experience" data={data?.experience} Component={ExperienceSection} />
+          <Section<Projects[]> title="Projects" data={data?.projects} Component={ProjectSection} />
+          <Section<Skills[]> title="Skills" data={data?.skills} Component={SkillsSection} />
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-blue-400 mb-4 flex items-center">
+              <GrAchievement className="w-6 h-6 mr-2" /> Achievements
+            </h2>
+            
+            {data.achievements && data.achievements.length > 0 ? (
+              data.achievements.map((achievement, index) => (
+                <div key={index} className="mb-6 bg-gray-800/40 p-4 rounded-lg">
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {achievement.name}
+                  </h3>
+                  <ul className="list-disc list-inside">
+                    {achievement.points.map((point, pointIndex) => (
+                      <li key={pointIndex} className="text-gray-300 ml-4">
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-400">No achievements added</p>
+            )}
+          </div>
           <div className='h-20'></div>
         </div>
       </div>
@@ -102,16 +113,20 @@ export default function Review() {
   );
 };
 
-interface SectionProps {
+interface SectionProps<T> {
   title: string;
-  data: PersonalDetailType | EducationType[] | ExperienceType[] | Projects[] | Achievements[] | Skills[] | null;
-  Component: React.ComponentType<{ data: PersonalDetailType | EducationType[] | ExperienceType[] | Projects[] | Achievements[] | Skills[] | null }>;
+  data: T | null;
+  Component: React.ComponentType<{ data: T }>;
 }
 
-const Section: React.FC<SectionProps> = ({ title, data, Component }) => (
+const Section = <T,>({ title, data, Component }: SectionProps<T>) => (
   <div className='text-white'>
     <h2 className='text-center text-sm lg:text-2xl font-semibold'>{title}</h2>
-    {data == null ? <h2 className='text-center text-sm lg:text-2xl text-gray-400'>No data available</h2> : <Component data={data} />}
+    {data == null ? (
+      <h2 className='text-center text-sm lg:text-2xl text-gray-400'>No data available</h2>
+    ) : (
+      <Component data={data} />
+    )}
     <hr className="border border-gray-300 my-4" />
   </div>
 );
@@ -199,31 +214,12 @@ const DownloadModal = ({ data} : {data: DataType} ) => {
 };
 
 const SkillsSection = ({ data }: { data: Skills[] }) => (
-  <div className='text-white'>
+  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
     {data?.map((val, index) => (
-      <div key={index} className='bg-gray-800 my-2'>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>{val?.name}: {val?.skills}</span>
-        </p>
-      </div>
-    ))}
-  </div>
-);
-
-const AchievementSection = ({ data }: { data: Achievements[] }) => (
-  <div className='text-white'>
-    {data?.map((val, index) => (
-      <div key={index} className='bg-gray-800 my-2'>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Company: {val?.name}</span>
-        </p>
-        <div className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Points</span>
-          <div>
-            {val.description?.map((point, index) => (
-              <p key={index}>{point}</p>
-            ))}
-          </div>
+      <div key={index} className='bg-gray-800/40 p-4 rounded-lg'>
+        <div className='flex justify-between items-center'>
+          <span className='text-lg font-semibold'>{val?.skillName}</span>
+          <span className='text-blue-400'>{val?.skillValue}</span>
         </div>
       </div>
     ))}
@@ -231,91 +227,116 @@ const AchievementSection = ({ data }: { data: Achievements[] }) => (
 );
 
 const ExperienceSection = ({ data }: { data: ExperienceType[] }) => (
-  <div className='text-white'>
+  <div className='space-y-6'>
     {data?.map((val, index) => (
-      <div key={index} className='bg-gray-800 my-2'>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Company: {val?.company}</span>
-          <span>Role: {val?.role}</span>
-        </p>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Location: {val?.location}</span>
-          <span>Date: {val?.date}</span>
-        </p>
-        <div className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Points</span>
+      <div key={index} className='bg-gray-800/40 p-6 rounded-lg'>
+        <div className='flex flex-col md:flex-row md:justify-between mb-4'>
           <div>
-            {val.points?.map((point, index) => (
-              <p key={index}>{point}</p>
-            ))}
+            <h3 className='text-xl font-bold text-blue-400'>{val?.company}</h3>
+            <p className='text-lg font-semibold'>{val?.role}</p>
+          </div>
+          <div className='text-gray-400'>
+            <p>{val?.location}</p>
+            <p>{val?.date}</p>
           </div>
         </div>
+        <ul className='list-disc list-inside space-y-2'>
+          {val.points?.map((point, index) => (
+            <li key={index} className='text-gray-300 ml-4'>{point}</li>
+          ))}
+        </ul>
       </div>
     ))}
   </div>
 );
 
 const ProjectSection = ({ data }: { data: Projects[] }) => (
-  <div className='text-white'>
-    {data?.map((val, index) => (
-      <div key={index} className='bg-gray-800 my-2'>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Project Name: {val?.name}</span>
-          <span>Tech Stack: {val?.techstack}</span>
-        </p>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Link: {val?.link}</span>
-        </p>
-        <div className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Points</span>
-          <div>
-            {val.description?.map((point, index) => (
-              <p key={index}>{point}</p>
-            ))}
+  <div className='space-y-6'>
+    {data?.map((project, index) => (
+      <div key={index} className='bg-gray-800/40 p-6 rounded-lg'>
+        <div className='flex flex-col md:flex-row justify-between mb-4'>
+          <h3 className='text-xl font-bold text-blue-400'>{project.projectName}</h3>
+          <div className='text-gray-400'>
+            <span className='bg-gray-700 px-3 py-1 rounded-full text-sm'>
+              {project.tech}
+            </span>
           </div>
         </div>
+        {project.link && (
+          <a href={project.link} 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             className='text-blue-400 hover:text-blue-300 mb-4 inline-block'>
+            Project Link ↗
+          </a>
+        )}
+        <ul className='list-disc list-inside space-y-2'>
+          {project.points.map((point, idx) => (
+            <li key={idx} className='text-gray-300 ml-4'>{point}</li>
+          ))}
+        </ul>
       </div>
     ))}
   </div>
 );
 
 const EducationSection = ({ data }: { data: EducationType[] }) => (
-  <div className='text-white'>
-    {data?.map((val, index) => (
-      <div key={index} className='bg-gray-800 my-2'>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>College Name: {val?.college}</span>
-          <span>Course: {val?.course}</span>
-        </p>
-        <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-          <span>Location: {val?.location}</span>
-          <span>Year: {val?.date}</span>
-        </p>
+  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+    {data?.map((edu, index) => (
+      <div key={index} className='bg-gray-800/40 p-6 rounded-lg'>
+        <h3 className='text-xl font-bold text-blue-400 mb-2'>{edu.cllgName}</h3>
+        <p className='text-lg font-semibold mb-2'>{edu.course}</p>
+        <div className='text-gray-400'>
+          <p>{edu.location}</p>
+          <p>{edu.year}</p>
+        </div>
       </div>
     ))}
   </div>
 );
 
 const PersonalDetailSection = ({ data }: { data: PersonalDetailType | null }) => (
-  <div className="bg-gray-800 my-2">
-    <div className='text-white'>
-      <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-        <span>First Name: {data?.firstName}</span>
-        <span>Last Name: {data?.lastName}</span>
-      </p>
-      <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-        <span>Email: {data?.email}</span>
-        <span>Phone Number: {data?.phoneNo}</span>
-      </p>
-      <p className='text-white text-sm md:text-md flex flex-row justify-start space-x-20'>
-        <span>Github: {data?.github}</span>
-        <span>Linkedin: {data?.linkedin}</span>
-      </p>
+  <div className='bg-gray-800/40 p-6 rounded-lg'>
+    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+      <div className='space-y-4'>
+        <div>
+          <label className='text-gray-400 text-sm'>Full Name</label>
+          <p className='text-lg font-semibold'>{data?.firstName} {data?.lastName}</p>
+        </div>
+        <div>
+          <label className='text-gray-400 text-sm'>Email</label>
+          <p className='text-lg'>{data?.email}</p>
+        </div>
+        <div>
+          <label className='text-gray-400 text-sm'>Phone</label>
+          <p className='text-lg'>{data?.phoneNo}</p>
+        </div>
+      </div>
+      <div className='space-y-4'>
+        <div>
+          <label className='text-gray-400 text-sm'>Github</label>
+          <a href={data?.github} 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             className='text-blue-400 hover:text-blue-300 block'>
+            {data?.github}
+          </a>
+        </div>
+        <div>
+          <label className='text-gray-400 text-sm'>LinkedIn</label>
+          <a href={data?.linkedin} 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             className='text-blue-400 hover:text-blue-300 block'>
+            {data?.linkedin}
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 );
 
-const isValidEmail = (email: string) => {
+  const isValidEmail = (email: string) => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailPattern.test(email);
 };

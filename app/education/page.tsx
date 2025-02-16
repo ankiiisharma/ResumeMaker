@@ -10,38 +10,48 @@ import { FaGraduationCap, FaPlusCircle, FaTrashAlt } from "react-icons/fa";
 import Link from 'next/link';
 
 type Education = {
-    college: string;
+    cllgName: string;
     course: string;
     location: string;
-    date: string;
+    year: string;
 }
 
 const defaultExperience : Education = {
-    college: "",
+    cllgName: "",
     course: "",
     location: "",
-    date: "",
+    year: "",
 }
 
+const defaultEducation = [{ cllgName: '', course: '', location: '', year: '' }];
 
 export default function Education() {
     
-    const context = useContext(DataContext);
-    const router = useRouter();
-    const [formData, setFormData] = useState<Education[]>([defaultExperience]);
+  const router = useRouter();
+  const context = useContext(DataContext);
+  if (!context) throw new Error("DataContext must be used within DataProvider");
+  const { data, updateData } = context;
+  
+  // Ensure we always have a default value
+  const [formData, setFormData] = useState(
+    data?.education?.length ? data.education : defaultEducation
+  );
 
-
-    useEffect(()=> {
-        if(context?.data.education && context.data.education.length > 0) {
-            setFormData(context.data.education);
+    useEffect(() => {
+        if(data?.education && data.education.length > 0) {
+            const transformedData = data.education.map(item => ({
+                cllgName: item.cllgName,
+                course: item.course,
+                location: item.location,
+                year: item.year
+            }));
+            setFormData(transformedData);
         }
-    }, [context?.data.education]);
+    }, [data?.education]);
 
-    if(!context){
+    if(!data){
         return <p className="text-red-500">Error: DataContext not found</p>;
       };
-
-      const { updateData } = context;
 
       const addInput = () => {
         setFormData([...formData, defaultExperience]);
@@ -64,8 +74,13 @@ export default function Education() {
 
 
       const nextPage = () => {
-        updateData("education", formData);
-        console.log(formData)
+        const contextData = formData.map(item => ({
+            cllgName: item.cllgName,
+            course: item.course,
+            location: item.location,
+            year: item.year
+        }));
+        updateData("education", contextData);
         router.push("/experience");
       }
 
@@ -84,7 +99,13 @@ export default function Education() {
     
       const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        updateData("education", formData);
+        const contextData = formData.map(item => ({
+            cllgName: item.cllgName,
+            course: item.course,
+            location: item.location,
+            year: item.year
+        }));
+        updateData("education", contextData);
         router.push("/experience");
       }
 
@@ -128,9 +149,9 @@ export default function Education() {
                 <label className='block text-base font-semibold tracking-tight text-gray-200 items-center mb-2' >
                   College
                 </label>
-                <input type='text' name='college' placeholder='Dholakpur institute of technology'
-                value={value.college}
-                onChange={(e)=> handleInputChange(index, 'college', e.target.value)}
+                <input type='text' name='cllgName' placeholder='Dholakpur institute of technology'
+                value={value.cllgName}
+                onChange={(e)=> handleInputChange(index, 'cllgName', e.target.value)}
                 className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 />
@@ -140,7 +161,7 @@ export default function Education() {
                 <label className='block text-base font-semibold tracking-tight text-gray-200 items-center mb-2' >
                   Course
                 </label>
-                <input type='text' name='college' placeholder='B. Tech CSE'
+                <input type='text' name='course' placeholder='B. Tech CSE'
                 value={value.course}
                 onChange={(e)=> handleInputChange(index, 'course', e.target.value)}
                 className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -152,7 +173,7 @@ export default function Education() {
                 <label className='block text-base font-semibold tracking-tight text-gray-200 items-center mb-2' >
                   Location
                 </label>
-                <input type='text' name='college' placeholder='New Delhi, India'
+                <input type='text' name='location' placeholder='New Delhi, India'
                 value={value.location}
                 onChange={(e)=>handleInputChange(index,'location', e.target.value)}
                 className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -164,9 +185,9 @@ export default function Education() {
                 <label className='block text-base font-semibold tracking-tight text-gray-200 items-center mb-2' >
                   Completion Date
                 </label>
-                <input type='text' name='college' placeholder='June 2025'
-                value={value.date}
-                onChange={(e)=> handleInputChange(index, 'date', e.target.value)}
+                <input type='text' name='year' placeholder='2019 - 2023'
+                value={value.year}
+                onChange={(e)=> handleInputChange(index, 'year', e.target.value)}
                 className="w-full py-2 px-3 bg-transparent border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 />
