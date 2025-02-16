@@ -48,10 +48,10 @@ interface Projects {
   points: string[];
 }
 
-interface Achievements {
-  name: string;
-  points: string[];
-}
+// interface Achievements {
+//   name: string;
+//   points: string[];
+// }
 
 export default function Review() {
   const context = useContext(DataContext);
@@ -335,8 +335,5 @@ const PersonalDetailSection = ({ data }: { data: PersonalDetailType | null }) =>
     </div>
   </div>
 );
+ 
 
-  const isValidEmail = (email: string) => {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailPattern.test(email);
-};
